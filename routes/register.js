@@ -5,7 +5,7 @@ var express = require("express"),
     TITLE_REG = "注册";
 
 router.get("/", function(req, res) {
-    res.render("reg", {
+    res.render("register", {
         title: TITLE_REG,
         url: false
     });
@@ -24,7 +24,7 @@ router.post("/", function(req, res) {
         userpass: userPwd
     });
 
-    //检查用户名是否已经存在
+    //User 检查用户名是否已经存在
     User.getUserNumByName(newUser.username, function(err, results) {
         if (results != null && results[0]["num"] > 0) {
             err = "用户名已存在";
@@ -32,14 +32,14 @@ router.post("/", function(req, res) {
 
         if (err) {
             res.locals.error = err;
-            res.render("reg", { title: TITLE_REG });
+            res.render("register", { title: TITLE_REG });
             return;
         }
 
         newUser.save(function(err, result) {
             if (err) {
                 res.locals.error = err;
-                res.render("reg", { title: TITLE_REG });
+                res.render("register", { title: TITLE_REG });
                 return;
             }
 
@@ -50,7 +50,7 @@ router.post("/", function(req, res) {
                 res.locals.error = err;
             }
 
-            res.render("reg", { title: TITLE_REG });
+            res.render("register", { title: TITLE_REG });
         });
     });
 

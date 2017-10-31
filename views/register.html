@@ -27,11 +27,15 @@
 
       <form class="form-signin" role="form" method="post">
         <h2 class="form-signin-heading">注册</h2>
+        <% if (locals.img) { %> 
+            <div class="form-img">
+                <img src='<%= img %>' alt="" class="img-responsive" />
+            </div>
+        <% } %> 
         <% if(url) { %>
             <div class="form-img">
                 <img src='<%= url %>' alt="" class="img-responsive" />
             </div>
-            
         <% }  else { %>
             <a class="btn btn-link" href="/upload" role="button">上传照片</a>
         <% } %> 

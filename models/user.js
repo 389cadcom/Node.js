@@ -2,7 +2,7 @@
  * @Author: Lonves 
  * @Date: 2017-10-30 20:18:49 
  * @Last Modified by: lonves.zheng
- * @Last Modified time: 2017-10-30 20:33:33
+ * @Last Modified time: 2017-10-31 11:02:04
  * 
  * 连接池侦听connect事件
  */
@@ -10,10 +10,10 @@ var mysql = require("mysql");
 var DB_NAME = "db_admin";
 
 var pool = mysql.createPool({
-    host    : "localhost",
-    user    : "root",
+    host: "localhost",
+    user: "root",
     password: "",
-    port    : "3306"
+    port: "3306"
 });
 
 pool.on("connection", function(connection) {
@@ -54,7 +54,6 @@ pool.getConnection(function(err, connection) {
                     console.log("insertUser_Sql Error: " + err.message);
                     return;
                 }
-
                 //connection.release();
 
                 console.log("invoked[save]");
@@ -68,15 +67,11 @@ pool.getConnection(function(err, connection) {
         var getUserNumByName_Sql =
             "SELECT COUNT(1) AS num FROM tb_admin WHERE users = ?";
 
-        connection.query(getUserNumByName_Sql, [username], function(
-            err,
-            result
-        ) {
+        connection.query(getUserNumByName_Sql, [username], (err, result) => {
             if (err) {
                 console.log("getUserNumByName Error: " + err.message);
                 return;
             }
-
             //connection.release();
 
             console.log("invoked[getUserNumByName]");
@@ -88,15 +83,11 @@ pool.getConnection(function(err, connection) {
     User.getUserByUserName = function getUserNumByName(username, callback) {
         var getUserByUserName_Sql = "SELECT * FROM tb_admin WHERE users = ?";
 
-        connection.query(getUserByUserName_Sql, [username], function(
-            err,
-            result
-        ) {
+        connection.query(getUserByUserName_Sql, [username], (err, result) => {
             if (err) {
                 console.log("getUserByUserName Error: " + err.message);
                 return;
             }
-
             //connection.release();
 
             console.log("invoked[getUserByUserName]");
@@ -112,7 +103,6 @@ pool.getConnection(function(err, connection) {
                 console.log("getUsrList_Sql Error: " + err.message);
                 return;
             }
-
             //connection.release();
 
             console.log("invoked[getUsrList]");

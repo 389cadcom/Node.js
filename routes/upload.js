@@ -1,10 +1,15 @@
 var express = require("express");
+var fs = require("fs");
+var path = require("path");
+var multer = require("multer");
 var router = express.Router();
+
 var formidable = require("formidable");
+const FILES_DIR = 'upload';
+
+router.use(multer({dest: '/tmp/'}).array('image'));
 
 TITLE_REG = "注册";
-AVATAR_UPLOAD_FOLDER = "/avatar/";
-fs = require("fs");
 
 function uuid() {
     var s = [];
@@ -18,6 +23,7 @@ function uuid() {
     var uuid = s.join("");
     return uuid;
 }
+
 /* GET home page. */
 router.get("/", function(req, res) {
     res.render("upload", {
@@ -25,107 +31,40 @@ router.get("/", function(req, res) {
     });
 });
 router.post("/", function(req, res) {
-    var folder_Name = uuid(); //个人文件夹的名称
-    var file_Name = uuid(); //上传照片的文件名称
+    var file = req.files[0];
+    var d = new Date();
+    var time = [d.getFullYear(), (d.getMonth() + 1), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()].join('');
+    
+    var ext      = path.extname(file.originalname);
+    var fileDir  = path.join('public', FILES_DIR);
+    var fileName = time + ext;
+    //var imgDir  = path.join(fileDir, uuid());
+    //console.log(file);
 
-    form = new formidable.IncomingForm(); //创建上传表单
-    form.encoding = "utf-8"; //设置编辑
-    form.fileDir = "public" + AVATAR_UPLOAD_FOLDER; //设置上传目录
-    form.uploadDir = form.fileDir + folder_Name + "/"; //设置上传目录
-    form.keepExtensions = true; //保留后缀
-    form.maxFieldsSize = 2 * 1024 * 1024; //文件大小
-    var picUrl = AVATAR_UPLOAD_FOLDER + folder_Name + "/" + file_Name + ".jpg";
-    fs.exists(form.fileDir, function(exists) {
+    //上传目录
+    fs.exists(fileDir, function(exists) {
         if (!exists) {
-            fs.mkdir(form.fileDir, function() {
-                console.log(form.fileDir);
-            });
-        } else {
-            console.log("上传文件夹目录已存在！");
+            fs.mkdirSync(fileDir);                      //新建文件夹
         }
-    });
-    fs.exists(form.uploadDir, function(exists) {
-        if (!exists) {
-            fs.mkdir(form.uploadDir, function() {
-                form.parse(req, function(err, fields, files) {
-                    if (err) {
-                        res.locals.error = err;
-                        res.render("login", {
-                            title: TITLE_REG
-                        });
-                        return;
-                    }
-
-                    var extName = ""; //后缀名
-                    switch (files.fileupload.type) {
-                        case "image/pjpeg":
-                            extName = "jpg";
-                            break;
-                        case "image/jpeg":
-                            extName = "jpg";
-                            break;
-                        case "image/png":
-                            extName = "png";
-                            break;
-                        case "image/x-png":
-                            extName = "png";
-                            break;
-                    }
-                    if (extName.length == 0) {
-                        res.locals.error = "只支持png和jpg格式图片";
-                        res.render("index", {
-                            title: TITLE_REG
-                        });
-                        return;
-                    }
-
-                    var avatarName = file_Name + "." + extName;
-                    var newPath = form.uploadDir + avatarName;
-                    fs.renameSync(files.fileupload.path, newPath); //重命名
-                });
-            });
-        } else {
-            console.log("上传文件夹已存在！");
-            form.parse(req, function(err, fields, files) {
-                if (err) {
-                    res.locals.error = err;
-                    res.render("login", {
-                        title: TITLE_REG
-                    });
-                    return;
+        fs.readFile(file.path, (err, data)=>{           //读写图片文件
+            if(err) {
+                console.log(err);
+                return false;
+            }
+            fs.writeFile(path.join(fileDir, fileName), data, err=>{
+                if(err){
+                    console.log(err);
+                    return false;
                 }
-                var extName = ""; //后缀名
-                switch (files.fileupload.type) {
-                    case "image/pjpeg":
-                        extName = "jpg";
-                        break;
-                    case "image/jpeg":
-                        extName = "jpg";
-                        break;
-                    case "image/png":
-                        extName = "png";
-                        break;
-                    case "image/x-png":
-                        extName = "png";
-                        break;
-                }
-                if (extName.length == 0) {
-                    res.locals.error = "只支持png和jpg格式图片";
-                    res.render("index", {
-                        title: TITLE_REG
-                    });
-                    return;
-                }
-                var avatarName = file_Name + "." + extName;
-                var newPath = form.uploadDir + avatarName;
-                fs.renameSync(files.fileupload.path, newPath); //重命名
-            });
-        }
+            })
+        })
     });
     res.locals.success = "上传成功";
-    res.render("reg", {
+
+    //当前路径渲染注册页面
+    res.render("register", {
         title: TITLE_REG,
-        url: picUrl
+        url: path.join('../upload', fileName)
     });
 });
 module.exports = router;

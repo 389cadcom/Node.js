@@ -2,13 +2,14 @@ var express      = require('express');
 var path         = require('path');
 var favicon      = require('static-favicon');
 var logger       = require('morgan');
+var multer       = require('multer');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 var ejs          = require('ejs');
 
 var routes   = require('./routes/index');
-var reg      = require('./routes/reg');
+var register = require('./routes/register');
 var login    = require('./routes/login');
 var userlist = require('./routes/userlist');
 var main     = require('./routes/main');
@@ -32,14 +33,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 //这里传入了一个密钥加session id
-app.use(cookieParser('Wilson'));            //默认空值cookieParser()？？
+// app.use(cookieParser('Wilson'));            //默认空值cookieParser()？？
 app.use(session({ secret: 'wilson'}));
 
 app.use('/', routes);
 app.use('/', login);                        //指定首级, 路由中设置多个路径
 app.use('/main', main);
-app.use('/reg', reg);
+app.use('/reg', register);
 app.use('/userlist', userlist);
 app.use('/upload', upload);
 

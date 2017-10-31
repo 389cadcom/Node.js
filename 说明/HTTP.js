@@ -1,5 +1,5 @@
 //Router		roter = express.Router()
-router.METHOD()
+router.METHOD()			//get, post, put
 router.all()
 //router.param()		//v4.11弃用，路由配置参数
 router.route()

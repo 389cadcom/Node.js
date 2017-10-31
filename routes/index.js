@@ -8,7 +8,7 @@ router.get("/", function(req, res) {
     }
 
     if (req.session.username) {
-        console.log("session:" + req.session.username);
+        console.log("Session:" + req.session.username);
         res.locals.username = req.session.username;
     } else {
         res.redirect("/login");
