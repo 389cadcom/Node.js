@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title></title>
+</head>
+<body>
+<div id="oDiv">abc</div>
+
+</body>
+<script>
+var header = new Headers();
+//header.append("Content-Type", "text/plain");
+
+/*fetch("http://192.168.1.104:8000/test", {headers: header})
+  .then(function(res){
+  	  console.log(res.headers.getAll('Content'));
+  	  console.log(res.headers.get('Content-Type'));
+  	  res.json().then(json=>{
+  	  	  console.log(JSON.stringify(json))
+  	  	  document.getElementById("oDiv").innerHTML =JSON.stringify(json); 
+  	  })
+  })
+  */
+ 
+var obj = JSON.stringify({ user: 'lisposter', pwd: 'souche.com'});
+console.log(obj)
+
+fetch('http://192.168.1.104:8000/test', {  
+    method: 'post',
+    headers: { 
+      "Content-type": "application/x-www-form-urlencoded; charset=UTF-8" 
+    }, 
+    body: 'foo=bar&lorem=ipsum' 
+});
+</script>
+</html>

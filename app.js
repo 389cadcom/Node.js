@@ -38,6 +38,25 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use(cookieParser('Wilson'));            //默认空值cookieParser()？？
 app.use(session({ secret: 'wilson'}));
 
+//设置跨域访问
+app.all('*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    res.header("X-Powered-By",' 3.2.1')
+    res.header("Content-Type", "application/json;charset=utf-8");
+    next();
+});
+app.get("/test", function(req, res){
+	res.send({id:1, name: "Access-Control-Allow-Origin"});
+})
+
+app.post("/test", function(req, res){
+    var body = req.body;
+    console.log(body);
+    res.end("Hi");
+})
+
 app.use('/', routes);
 app.use('/', login);                        //指定首级, 路由中设置多个路径
 app.use('/main', main);
