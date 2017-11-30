@@ -39,7 +39,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: 'wilson'}));
 
 //设置跨域访问
-app.all('*', function(req, res, next) {
+/* app.all('*', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
@@ -49,7 +49,7 @@ app.all('*', function(req, res, next) {
 });
 app.get("/test", function(req, res){
 	res.send({id:1, name: "Access-Control-Allow-Origin"});
-})
+}) */
 
 app.post("/test", function(req, res){
     var body = req.body;
@@ -71,8 +71,6 @@ app.use(function(req, res, next) {
     err.status = 404;
     next(err);
 });
-
-
 
 // 错误中间件
 // development error handler
