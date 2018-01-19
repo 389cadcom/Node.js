@@ -1,15 +1,11 @@
-var express = require("express");
-var fs = require("fs");
-var path = require("path");
-var multer = require("multer");
-var router = express.Router();
-
+var express    = require("express");
+var router     = express.Router();
 var formidable = require("formidable");
-const FILES_DIR = 'upload';
-
-router.use(multer({dest: '/tmp/'}).array('image'));
+var fs         = require("fs");
+var path       = require("path");
 
 TITLE_REG = "注册";
+UPLOAD_DIR = "uploads";
 
 function uuid() {
     var s = [];
@@ -30,41 +26,78 @@ router.get("/", function(req, res) {
         title: TITLE_REG
     });
 });
-router.post("/", function(req, res) {
-    var file = req.files[0];
-    var d = new Date();
-    var time = [d.getFullYear(), (d.getMonth() + 1), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()].join('');
+
+function getDateName(){
+    var date = new Date(),
+        y = date.getFullYear(),
+        m = date.getMonth() + 1,
+        d = date.getDate(),
+        h = date.getHours(),
+        i = date.getMinutes(),
+        s = date.getSeconds();
+    m = m < 10 ? '0' + m: m;
+    d = d < 10 ? '0' + d: d;
+    h = h < 10 ? '0' + h: h;
+    i = i < 10 ? '0' + i: i;
+    s = s < 10 ? '0' + s: s;
     
-    var ext      = path.extname(file.originalname);
-    var fileDir  = path.join('public', FILES_DIR);
-    var fileName = time + ext;
-    //var imgDir  = path.join(fileDir, uuid());
-    //console.log(file);
+    return [y, m, d, h, i, s].join('');
+}
 
-    //上传目录
-    fs.exists(fileDir, function(exists) {
+console.log(__dirname);
+
+//TODO
+router.post("/", function(req, res) {
+    var folder_Name     = uuid();               //个人文件夹的名称
+    var file_Name       = uuid();               //上传照片的文件名称
+
+    var form = new formidable.IncomingForm();       //创建上传表单
+        form.encoding       = 'utf-8';              //设置编辑
+        form.uploadDir      = path.join('public', UPLOAD_DIR);//设置上传目录
+        form.keepExtensions = true;                 //保留后缀
+        form.maxFieldsSize  = 2 * 1024 * 1024;      //文件大小
+    
+    //目录是否存在
+    fs.exists(form.uploadDir, function(exists) {
         if (!exists) {
-            fs.mkdirSync(fileDir);                      //新建文件夹
+            fs.mkdir(form.uploadDir, function() {
+                console.log(form.uploadDir);
+            });
+        } else {
+            console.log("上传文件夹目录已存在！");
         }
-        fs.readFile(file.path, (err, data)=>{           //读写图片文件
-            if(err) {
-                console.log(err);
-                return false;
-            }
-            fs.writeFile(path.join(fileDir, fileName), data, err=>{
-                if(err){
-                    console.log(err);
-                    return false;
-                }
-            })
-        })
     });
-    res.locals.success = "上传成功";
 
-    //当前路径渲染注册页面
-    res.render("register", {
-        title: TITLE_REG,
-        url: path.join('../upload', fileName)
+    form.parse(req, function(err, fields, files) {
+        if (err) {
+            res.locals.error = err;
+            res.render("login", { title: TITLE_REG });
+            return;
+        }
+        console.log(fields, files);
+
+        var extName = path.extname(files.uploadImg.name);   //name = uploadImg
+        
+        if(extName.length == 0){
+              res.locals.error = '只支持png和jpg格式图片';
+              res.render('login', { title: TITLE });
+              return;                   
+        }
+        var fileName = getDateName() + extName;
+        var newPath = path.join(form.uploadDir, fileName);
+        fs.renameSync(files.uploadImg.path, newPath);       //重命名
+
+        res.locals.success = "上传成功";
+        res.render("register", { title: TITLE_REG, url: '../' + UPLOAD_DIR + "/" + fileName });
+        /*
+            res.writeHead(200, {"Content-type": "text/html"});
+            res.write("Received image:<br>");
+            res.write("<image src=/show />");
+            res.end();
+        */
+    });
+    form.on('progress', function(bytesReceived, totals) {
+        console.log(bytesReceived, totals)
     });
 });
 module.exports = router;

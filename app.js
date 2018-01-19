@@ -13,6 +13,7 @@ var register = require('./routes/register');
 var login    = require('./routes/login');
 var userlist = require('./routes/userlist');
 var main     = require('./routes/main');
+// var upload   = require('./routes/upload-multer');
 var upload   = require('./routes/upload');
 
 var app = express();
@@ -20,42 +21,36 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.engine('.html', ejs.__express);
 app.set('view engine', 'html');
-
-//app.engine('.html', require('ejs').__express);  
-//app.set('view engine', 'html');  
+app.engine('html', require('ejs').__express);    //renderFile
 
 app.use(favicon());
-app.use(logger('dev'));
+app.use(logger('dev'));                             //不记录静态文件请求(内容提前)
 app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'))
+
+app.use(bodyParser.json());                         //application/json
+app.use(bodyParser.urlencoded());                   //application/x-www-urlencodeed
+// app.use(multer({dest: 'temp'}).array('image'))   //multipart/form-data
 
 
 //这里传入了一个密钥加session id
-// app.use(cookieParser('Wilson'));            //默认空值cookieParser()？？
+// app.use(cookieParser('Wilson'));                 //默认空值cookieParser()？？
 app.use(session({ secret: 'wilson'}));
 
+//app.use(require("cors")())                          // allow Cross-domain requests 
 //设置跨域访问
-/* app.all('*', function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
+app.all('*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "Orgin");
+    res.header("Access-Control-Allow-Credentials", "true");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
     res.header("X-Powered-By",' 3.2.1')
-    res.header("Content-Type", "application/json;charset=utf-8");
+    //res.header("Content-Type", "application/json;charset=utf-8");
     next();
 });
-app.get("/test", function(req, res){
-	res.send({id:1, name: "Access-Control-Allow-Origin"});
-}) */
 
-app.post("/test", function(req, res){
-    var body = req.body;
-    console.log(body);
-    res.end("Hi");
-})
+app.use('/test', require('./routes/test.js'));
 
 app.use('/', routes);
 app.use('/', login);                        //指定首级, 路由中设置多个路径
@@ -65,7 +60,7 @@ app.use('/userlist', userlist);
 app.use('/upload', upload);
 
 
-/// catch 404 and forward to error handler
+// catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
@@ -100,5 +95,12 @@ app.use(function(err, req, res, next) {
 app.listen(8000, function(){
      console.log("Server has strart! Port: 8000");
 });
+
+/*
+app.listen = function(){
+    var server = http.createServer(this);
+    return server.listen.apply(server, arguments)
+}
+*/
 
 module.exports = app;

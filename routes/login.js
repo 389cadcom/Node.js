@@ -3,6 +3,7 @@ var express = require("express"),
     User = require("../models/user.js"),
     crypto = require("crypto"),
     TITLE_LOGIN = "登录";
+
 var User = require('../models/user');
 
 router.get("/login", function(req, res) {
@@ -17,6 +18,7 @@ router.get("/login", function(req, res) {
             res.render("login", { title: TITLE_LOGIN, user: user});
         }) */
     } else {
+        //res.setHeader("content-type", "application/html")
         res.render("login", { title: TITLE_LOGIN });
     }
 });

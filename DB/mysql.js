@@ -2,7 +2,7 @@
  * @Author: Lonves 
  * @Date: 2017-10-31 17:49:03 
  * @Last Modified by: lonves.zheng
- * @Last Modified time: 2017-12-15 16:11:47
+ * @Last Modified time: 2017-12-18 16:28:05
  * 
  * 封装方法：TODO 执行连接、关闭连接
  */
@@ -22,8 +22,7 @@ var destory = function(){
     })
 }
 
-var db = {};
-db.query = (sql, callback)=>{
+let query = (sql, callback)=>{
     if(!sql){
         callback();
         return;
@@ -47,4 +46,6 @@ pool.getConnection((err, conn)=>{
     })
 })
 */
-module.exports = db;
+module.exports = {
+    query
+};
